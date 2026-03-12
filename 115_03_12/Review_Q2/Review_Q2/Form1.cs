@@ -1,0 +1,99 @@
+﻿using System;
+using System.Globalization;
+using System.Windows.Forms;
+
+namespace Review_Q2
+{
+    public partial class Form1 : Form
+    {
+        // 固定價格設定
+        private const decimal PRICE_OIL_CHANGE = 780m;
+        private const decimal PRICE_OIL_SERVICE = 540m;
+        private const decimal PRICE_RADIATOR = 900m;
+        private const decimal PRICE_TRANSMISSION = 2400m;
+        private const decimal PRICE_INSPECTION = 450m;
+        private const decimal PRICE_MUFFLER = 3000m;
+        private const decimal PRICE_TIRE_ROTATION = 600m;
+
+        // 每小時工資與零件稅率（範例用）
+        private const decimal HOURLY_RATE = 480m;
+        private const decimal PARTS_TAX_RATE = 0.06m;
+
+        public Form1()
+        {
+            InitializeComponent();
+            this.Load += Form1_Load;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // 初始化（若需）
+        }
+
+        private void btnCalculate_Click(object sender, EventArgs e)
+        {
+            decimal servicesTotal = 0m;
+
+            if (chkOilChange.Checked) servicesTotal += PRICE_OIL_CHANGE;
+            if (chkOilService.Checked) servicesTotal += PRICE_OIL_SERVICE;
+            if (chkRadiator.Checked) servicesTotal += PRICE_RADIATOR;
+            if (chkTransmission.Checked) servicesTotal += PRICE_TRANSMISSION;
+            if (chkInspection.Checked) servicesTotal += PRICE_INSPECTION;
+            if (chkReplaceMuffler.Checked) servicesTotal += PRICE_MUFFLER;
+            if (chkTireRotation.Checked) servicesTotal += PRICE_TIRE_ROTATION;
+
+            decimal hours;
+            if (!decimal.TryParse(txtHours.Text.Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out hours) || hours < 0m)
+            {
+                MessageBox.Show("請輸入正確的工時數（數字且 >= 0）。", "輸入錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            decimal partsAmount;
+            if (!decimal.TryParse(txtParts.Text.Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out partsAmount) || partsAmount < 0m)
+            {
+                MessageBox.Show("請輸入正確的零件金額（數字且 >= 0）。", "輸入錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            servicesTotal += hours * HOURLY_RATE;
+
+            decimal partsTax = Math.Round(partsAmount * PARTS_TAX_RATE, 2);
+            decimal total = servicesTotal + partsAmount + partsTax;
+
+            txtServiceAndLabor.Text = string.Format(CultureInfo.InvariantCulture, "NT${0:N0}", servicesTotal);
+            txtPartsSummary.Text = string.Format(CultureInfo.InvariantCulture, "NT${0:N0}", partsAmount);
+            txtPartsTax.Text = string.Format(CultureInfo.InvariantCulture, "NT${0:N0}", partsTax);
+            txtTotal.Text = string.Format(CultureInfo.InvariantCulture, "NT${0:N0}", total);
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            chkOilChange.Checked = false;
+            chkOilService.Checked = false;
+            chkRadiator.Checked = false;
+            chkTransmission.Checked = false;
+            chkInspection.Checked = false;
+            chkReplaceMuffler.Checked = false;
+            chkTireRotation.Checked = false;
+
+            txtParts.Text = string.Empty;
+            txtHours.Text = string.Empty;
+
+            txtServiceAndLabor.Text = string.Empty;
+            txtPartsSummary.Text = string.Empty;
+            txtPartsTax.Text = string.Empty;
+            txtTotal.Text = string.Empty;
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void txtServiceAndLabor_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
