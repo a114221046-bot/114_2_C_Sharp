@@ -1,0 +1,127 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Microsoft.VisualBasic;
+
+namespace WindowsFormsApp2
+{
+    public partial class Form1 : Form
+    {
+        private List<Employee> employees = new List<Employee>();
+
+        public Form1()
+        {
+            InitializeComponent();
+            RefreshEmployeeList();
+        }
+
+        private void RefreshEmployeeList()
+        {
+            listBoxEmployees.Items.Clear();
+            foreach (var emp in employees)
+            {
+                listBoxEmployees.Items.Add($"{emp.IdNumber} - {emp.Name}");
+            }
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            string name = Interaction.InputBox("請輸入姓名:", "新增員工", "");
+            string idStr = Interaction.InputBox("請輸入員工編號 (整數):", "新增員工", "0");
+            if (!int.TryParse(idStr, out int id))
+            {
+                MessageBox.Show("員工編號需為整數。", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            string dept = Interaction.InputBox("請輸入部門:", "新增員工", "");
+            string pos = Interaction.InputBox("請輸入職稱:", "新增員工", "");
+
+            var emp = new Employee(name, id, dept, pos);
+            employees.Add(emp);
+            RefreshEmployeeList();
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            string idStr = Interaction.InputBox("請輸入要刪除的員工編號:", "刪除員工", "");
+            if (!int.TryParse(idStr, out int id))
+            {
+                MessageBox.Show("員工編號需為整數。", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            var emp = employees.FirstOrDefault(x => x.IdNumber == id);
+            if (emp == null)
+            {
+                MessageBox.Show("找不到此員工。", "訊息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            var dr = MessageBox.Show($"確定要刪除 {emp.IdNumber} - {emp.Name} 嗎?", "刪除確認", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dr == DialogResult.Yes)
+            {
+                employees.Remove(emp);
+                RefreshEmployeeList();
+            }
+        }
+
+        private void btnModify_Click(object sender, EventArgs e)
+        {
+            string idStr = Interaction.InputBox("請輸入要修改的員工編號:", "修改員工", "");
+            if (!int.TryParse(idStr, out int id))
+            {
+                MessageBox.Show("員工編號需為整數。", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            var emp = employees.FirstOrDefault(x => x.IdNumber == id);
+            if (emp == null)
+            {
+                MessageBox.Show("找不到此員工。", "訊息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            string newName = Interaction.InputBox("姓名:", "修改員工", emp.Name);
+            string newIdStr = Interaction.InputBox("員工編號 (整數):", "修改員工", emp.IdNumber.ToString());
+            if (!int.TryParse(newIdStr, out int newId))
+            {
+                MessageBox.Show("員工編號需為整數。", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            string newDept = Interaction.InputBox("部門:", "修改員工", emp.Department);
+            string newPos = Interaction.InputBox("職稱:", "修改員工", emp.Position);
+
+            emp.Name = newName;
+            emp.IdNumber = newId;
+            emp.Department = newDept;
+            emp.Position = newPos;
+
+            RefreshEmployeeList();
+        }
+
+        private void btnQuery_Click(object sender, EventArgs e)
+        {
+            string idStr = Interaction.InputBox("請輸入要查詢的員工編號:", "查詢員工", "");
+            if (!int.TryParse(idStr, out int id))
+            {
+                MessageBox.Show("員工編號需為整數。", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            var emp = employees.FirstOrDefault(x => x.IdNumber == id);
+            if (emp == null)
+            {
+                MessageBox.Show("找不到此員工。", "訊息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            MessageBox.Show($"員工編號: {emp.IdNumber}\n姓名: {emp.Name}\n部門: {emp.Department}\n職稱: {emp.Position}", "員工資料", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+    }
+}
